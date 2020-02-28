@@ -7,16 +7,16 @@ import {
   getNowDateTime,
   getNowTimestamp
 } from './utils';
-
 import {
   Title,
   MessageList,
-  SendMessageForm
+  SendMessageForm,
+  ModalAskUsername
 } from './components';
 
 let timer = null;
 const delay = 300;
-const limit = 10;
+const limit = 100;
 
 class App extends Component {
   constructor(props) {
@@ -25,29 +25,35 @@ class App extends Component {
     this.state = {
       username: '',
       message: '',
-      messages: []
+      messages: [],
+      scrolled: false,
+      isShow: true
     };
 
+    this.updateScroll = this.updateScroll.bind(this);
     this.removeAllData = this.removeAllData.bind(this);
     this.getData = this.getData.bind(this);
     this.postData = this.postData.bind(this);
     this.onSubmitMessage = this.onSubmitMessage.bind(this);
+    this.onScroll = this.onScroll.bind(this);
+    this.onCloseModal = this.onCloseModal.bind(this);
+    this.onSaveUsername = this.onSaveUsername.bind(this);
   };
 
   componentDidMount() {
-    if (this.state.username === '') {
-      var username = prompt('What is your username?');
-      this.setState({
-        ...this.state,
-        username: username
-      });
-    }
     timer = setTimeout(this.getData(), delay);
   };
 
   componentWillUnmount() {
     clearTimeout(timer);
   };
+
+  updateScroll() {
+    if(!this.state.scrolled){
+      var element = document.getElementById("message-list-box-id");
+      element.scrollTop = element.scrollHeight + 500;
+    }
+  }
 
   removeAllData() {
     return axios({
@@ -57,6 +63,7 @@ class App extends Component {
   };
 
   getData() {
+    this.updateScroll();
     var self = this;
     axios({
       url: Constants.BASE_URL + 'messages.json',
@@ -97,6 +104,8 @@ class App extends Component {
     })
     .then(res => {
       console.log(res);
+      var element = document.getElementById("message-list-box-id");
+      element.scrollTop = element.scrollHeight + 500;
     })
     .catch(err => {
       console.log(err)
@@ -118,11 +127,42 @@ class App extends Component {
     }
   };
 
+  onScroll() {
+    this.setState({
+      ...this.state,
+      scrolled: true
+    });
+  };
+
+  onCloseModal() {
+    this.setState({
+      ...this.state,
+      isShow: false
+    });
+  };
+
+  onSaveUsername(username) {
+    var self = this;
+    this.setState({
+      ...this.state,
+      username: username
+    }, () => {
+      self.onCloseModal();
+    });
+  };
+
   render() {
     return (
       <div>
+        <ModalAskUsername
+          isShow={this.state.isShow}
+          onClose={this.onCloseModal}
+          onSaveUsername={this.onSaveUsername} />
         <Title />
-        <MessageList messages={this.state.messages} currentUser={this.state.username} />
+        <MessageList
+          messages={this.state.messages}
+          currentUser={this.state.username}
+          onScroll={this.onScroll} />
         <SendMessageForm onSubmitMessage={this.onSubmitMessage} />
       </div>
     );

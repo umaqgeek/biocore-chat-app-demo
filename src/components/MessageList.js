@@ -3,7 +3,10 @@ import React, { Component } from 'react';
 class MessageList extends Component {
   render() {
     return (
-      <div className='message-list-box'>
+      <div
+        className='message-list-box'
+        id='message-list-box-id'
+        onScroll={this.props.onScroll}>
         {this.props.messages.map((m, i) => {
           var rightStyle = this.props.currentUser === m.username ? {marginLeft: 'auto', marginRight: 0} : {};
           var usernameView = this.props.currentUser === m.username ? (
