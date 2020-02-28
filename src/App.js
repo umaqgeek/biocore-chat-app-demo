@@ -63,19 +63,9 @@ class App extends Component {
       method: 'get'
     })
     .then(res => {
-      var messages = Object.values(res.data);
-      messages.sort((a, b) => {
-        if (a.timestamp > b.timestamp) {
-          return 1;
-        }
-        if (b.timestamp > a.timestamp) {
-          return -1;
-        }
-        return 0;
-      });
       self.setState({
         ...self.state,
-        messages: messages
+        messages: Object.values(res.data)
       }, () => {
         timer = setTimeout(self.getData(), delay);
       })
