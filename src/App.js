@@ -91,6 +91,10 @@ class App extends Component {
   };
 
   postData(message) {
+    if (this.state.username === '') {
+      window.location.reload(false);
+      return;
+    }
     axios({
       url: Constants.BASE_URL + 'messages.json',
       method: 'post',
