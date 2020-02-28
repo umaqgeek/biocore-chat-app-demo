@@ -23,7 +23,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      username: 'anon',
+      username: '',
       message: '',
       messages: []
     };
@@ -35,6 +35,13 @@ class App extends Component {
   };
 
   componentDidMount() {
+    if (this.state.username === '') {
+      var username = prompt('What is your username?');
+      this.setState({
+        ...this.state,
+        username: username
+      });
+    }
     timer = setTimeout(this.getData(), delay);
   };
 
